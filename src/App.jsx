@@ -142,6 +142,7 @@ function Layout() {
             {admin ? (
               <>
                 <span className="nav-link" aria-live="polite">Admin: {admin.email.split('@')[0]}</span>
+                <Link to="/admin/dashboard" className="btn primary">Dashboard</Link>
                 <button className="btn ghost" onClick={() => { localStorage.removeItem('admin'); setAdmin(null); window.dispatchEvent(new CustomEvent('admin:change', { detail: null })); }} >Admin Sign out</button>
               </>
             ) : user ? (
