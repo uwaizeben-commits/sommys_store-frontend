@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { createHashRouter, RouterProvider, Link, Outlet, useLocation } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Link, Outlet, useLocation } from 'react-router-dom'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
 import Recover from './pages/Recover'
@@ -205,7 +205,7 @@ function Layout() {
   )
 }
 
-const routerWithLayout = createHashRouter([
+const routerWithLayout = createBrowserRouter([
   {
     path: '/',
     element: <Layout />,
