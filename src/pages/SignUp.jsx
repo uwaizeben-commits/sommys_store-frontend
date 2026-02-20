@@ -20,7 +20,8 @@ export default function SignUp() {
       if (AUTH_SIGNUP_URL) {
         const res = await fetch(AUTH_SIGNUP_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, phone, password }) })
         if (!res.ok) throw new Error('Signup failed')
-        const user = await res.json()
+        const resp = await res.json()
+        const user = resp.user || resp
         localStorage.setItem('user', JSON.stringify(user))
         try { window.dispatchEvent(new CustomEvent('user:change', { detail: user })) } catch (e) {}
         navigate('/')
@@ -31,7 +32,7 @@ export default function SignUp() {
       if (users.find(u => u.email === email || u.phone === phone)) return setError('User already exists')
       users.push({ email, phone, password })
       localStorage.setItem('users', JSON.stringify(users))
-      const userObj = { email, phone }
+      const userObj = { email, phone, name: '' }
       localStorage.setItem('user', JSON.stringify(userObj))
       try { window.dispatchEvent(new CustomEvent('user:change', { detail: userObj })) } catch (e) {}
       navigate('/')

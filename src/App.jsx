@@ -46,7 +46,8 @@ function Layout() {
       setCartCount(0)
     }
     try {
-      const u = JSON.parse(localStorage.getItem('user') || 'null')
+      let u = JSON.parse(localStorage.getItem('user') || 'null')
+      if (u && u.user) u = u.user
       if (u) setUser(u)
     } catch (e) {}
     try {
@@ -58,7 +59,8 @@ function Layout() {
   useEffect(() => {
     function onUserChange(e) {
       try {
-        const u = e && e.detail ? e.detail : JSON.parse(localStorage.getItem('user') || 'null')
+        let u = e && e.detail ? e.detail : JSON.parse(localStorage.getItem('user') || 'null')
+        if (u && u.user) u = u.user
         setUser(u)
       } catch (err) { setUser(null) }
     }
@@ -169,7 +171,7 @@ function Layout() {
               </>
             ) : user ? (
               <>
-                <span className="nav-link" aria-live="polite">Hi, {user.email ? user.email.split('@')[0] : (user.phone || 'User')}</span>
+                <span className="nav-link" aria-live="polite">Hi, {user.name || (user.email ? user.email.split('@')[0] : (user.phone || 'User'))}</span>
                 <button className="btn ghost" onClick={() => { localStorage.removeItem('user'); setUser(null); window.dispatchEvent(new CustomEvent('user:change', { detail: null })); }} >Sign out</button>
               </>
             ) : (

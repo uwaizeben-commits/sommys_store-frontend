@@ -17,7 +17,9 @@ export default function SignIn() {
       if (AUTH_SIGNIN_URL) {
         const res = await fetch(AUTH_SIGNIN_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ identifier, password }) })
         if (!res.ok) throw new Error('Invalid credentials')
-        const user = await res.json()
+        const resp = await res.json()
+        // backend returns { token, user: { id, email, name } }
+        const user = resp.user || resp
         localStorage.setItem('user', JSON.stringify(user))
         // notify app layout that user changed
         try { window.dispatchEvent(new CustomEvent('user:change', { detail: user })) } catch (e) {}
@@ -45,7 +47,7 @@ export default function SignIn() {
       })
 
       if (!found) return setError('Invalid email/phone or password')
-      const userObj = { email: found.email, phone: found.phone }
+      const userObj = { email: found.email, phone: found.phone, name: found.name }
       localStorage.setItem('user', JSON.stringify(userObj))
       try { window.dispatchEvent(new CustomEvent('user:change', { detail: userObj })) } catch (e) {}
       
