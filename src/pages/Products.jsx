@@ -7,7 +7,8 @@ export default function Products() {
 
   useEffect(() => {
     setLoading(true)
-    fetch('/api/products')
+    const API_URL = 'https://sommys-store-backend.onrender.com/api/products'
+    fetch(API_URL)
       .then((res) => res.json())
       .then((data) => setProducts(data || []))
       .catch(() => setProducts([]))
