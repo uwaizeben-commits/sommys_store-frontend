@@ -22,6 +22,7 @@ export default function Products() {
       if (existing) existing.quantity = (existing.quantity || 1) + 1
       else cart.push({ productId: p._id, name: p.name, price: p.price, image: p.images && p.images[0], quantity: 1 })
       localStorage.setItem('cart', JSON.stringify(cart))
+      try { window.dispatchEvent(new CustomEvent('cart:change', { detail: cart })) } catch (e) {}
       alert('Added to cart')
     } catch (e) {
       alert('Could not add to cart')

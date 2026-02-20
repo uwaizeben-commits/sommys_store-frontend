@@ -75,6 +75,17 @@ function Layout() {
     return () => window.removeEventListener('admin:change', onAdminChange)
   }, [])
 
+  useEffect(() => {
+    function onCartChange(e) {
+      try {
+        const cart = e && e.detail ? e.detail : JSON.parse(localStorage.getItem('cart') || '[]')
+        setCartCount(cart.reduce((s, i) => s + (i.quantity || 0), 0))
+      } catch (err) { setCartCount(0) }
+    }
+    window.addEventListener('cart:change', onCartChange)
+    return () => window.removeEventListener('cart:change', onCartChange)
+  }, [])
+
   function handleSubscribe(e) {
     e.preventDefault()
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return

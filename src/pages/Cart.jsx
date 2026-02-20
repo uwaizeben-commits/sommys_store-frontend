@@ -17,6 +17,7 @@ export default function Cart() {
     next[index].quantity = qty < 1 ? 1 : qty
     localStorage.setItem('cart', JSON.stringify(next))
     setCart(next)
+    try { window.dispatchEvent(new CustomEvent('cart:change', { detail: next })) } catch (e) {}
   }
 
   function removeItem(index) {
@@ -24,6 +25,7 @@ export default function Cart() {
     next.splice(index, 1)
     localStorage.setItem('cart', JSON.stringify(next))
     setCart(next)
+    try { window.dispatchEvent(new CustomEvent('cart:change', { detail: next })) } catch (e) {}
   }
 
   const total = cart.reduce((s, i) => s + (Number(i.price) || 0) * (i.quantity || 1), 0)
