@@ -12,6 +12,8 @@ import About from './pages/About'
 import Products from './pages/Products'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
+import Checkout from './pages/Checkout'
+import logoImg from './assets/sommystore-logo.jpg'
 import './header.css'
 
 const SOCIAL_LINKS = {
@@ -33,7 +35,6 @@ function Layout() {
   const [email, setEmail] = useState('')
   const [subscribed, setSubscribed] = useState(false)
   const location = useLocation()
-  const onHero = location && location.pathname === '/'
 
   useEffect(() => {
     try {
@@ -119,12 +120,15 @@ function Layout() {
 
   return (
     <div className="app-root">
-      <header className={`app-header ${onHero ? 'hero-mode' : ''}`}>
+      <header className="app-header">
         <div className="header-left">
+          <Link to="/" className="logo" aria-label="Sommy's Store">
+            <img src={logoImg} alt="Sommy's Store" className="logo-img" />
+            <span className="logo-text">Sommy's Store</span>
+          </Link>
           <button className="nav-toggle" aria-label={navOpen ? 'Close menu' : 'Open menu'} aria-expanded={navOpen} onClick={() => setNavOpen(v => !v)}>
             <svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M0 1.5h22" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><path d="M0 7h22" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><path d="M0 12.5h22" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
           </button>
-          <Link to="/" className="logo">Sommy's Store</Link>
         </div>
         <div className="header-center">
           <input className="search" placeholder="Search products, categories..." />
@@ -212,6 +216,7 @@ const routerWithLayout = createBrowserRouter([
     { path: 'about', element: <About /> },
       { path: 'product/:id', element: <Product /> },
       { path: 'cart', element: <Cart /> },
+      { path: 'checkout', element: <Checkout /> },
       { path: 'signin', element: <SignIn /> },
       { path: 'signup', element: <SignUp /> },
       { path: 'recover', element: <Recover /> },

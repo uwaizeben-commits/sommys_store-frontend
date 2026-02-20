@@ -3,6 +3,8 @@
   --muted: #6b7280;
   --brand: #ef4444;
   --surface: #ffffff;
+  --navbar-bg: #0f2741;
+  --navbar-text: #f5f7fa;
 }
 
 /* Base layout */
@@ -17,58 +19,70 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 20px;
-  border-bottom: 1px solid #e6e9ee;
-  background: var(--surface);
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(245, 247, 250, 0.1);
+  background: var(--navbar-bg);
   position: relative;
   z-index: 2;
-}
-.app-header.hero-mode {
-  background: transparent;
-  border-bottom: none;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  color: #fff;
+  box-shadow: 0 2px 8px rgba(15, 39, 65, 0.1);
 }
 .logo {
-  font-weight: 700;
-  color: var(--brand);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   text-decoration: none;
-  font-size: 1.125rem;
+  transition: opacity 0.2s ease;
 }
-.app-header.hero-mode .logo { color: #fff }
+.logo:hover {
+  opacity: 0.85;
+}
+.logo-img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  display: block;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(2, 6, 23, 0.12);
+  background: #fff;
+  padding: 4px;
+}
+.logo-text {
+  font-weight: 700;
+  color: var(--navbar-text);
+  font-size: 1.0625rem;
+}
 
 .search {
   width: 420px;
   max-width: 50vw;
   padding: 8px 12px;
-  border: 1px solid #e6e9ee;
+  border: 1px solid rgba(245, 247, 250, 0.2);
   border-radius: 8px;
+  background: rgba(245, 247, 250, 0.08);
+  color: var(--navbar-text);
 }
-.app-header.hero-mode .search { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.18); color: #fff }
+.search::placeholder {
+  color: rgba(245, 247, 250, 0.6);
+}
 
 .nav-links { display: flex; gap: 12px; align-items: center }
-.nav-link { color: var(--muted); text-decoration: none; padding:6px 8px; border-radius:6px }
+.nav-link { color: var(--navbar-text); text-decoration: none; padding: 6px 8px; border-radius: 6px; transition: color 0.14s ease, background 0.12s ease }
+.nav-link:hover, .nav-link:focus { color: var(--brand); background: rgba(239, 68, 68, 0.12) }
+.nav-link:focus-visible { outline: 3px solid rgba(239, 68, 68, 0.3); outline-offset: 4px; border-radius: 6px }
 
 /* hamburger toggle (hidden on desktop) */
-.nav-toggle { display: none; background: transparent; border: none; padding: 6px; margin-right: 8px; color: var(--accent); cursor: pointer }
-.nav-toggle svg { display: block }
-.app-header.hero-mode .nav-link { color: #fff }
+.nav-toggle { display: none; background: transparent; border: none; padding: 6px; margin-left: 8px; margin-right: 0; color: var(--navbar-text); cursor: pointer }
+.nav-toggle svg { display: block; width: 22px; height: 14px }
 
-/* subtle hover/focus motion for nav items */
-.nav-links .nav-link, .nav-links .btn { transition: color .14s ease, transform .12s ease, background .12s ease }
-.nav-links .nav-link:hover, .nav-links .nav-link:focus { color: var(--brand); transform: translateY(-3px); text-decoration: none }
-.nav-links .nav-link:focus-visible { outline: 3px solid rgba(239,68,68,0.12); outline-offset: 4px; border-radius: 6px }
-.app-header.hero-mode .nav-links .nav-link:hover { color: #fff; transform: translateY(-2px); text-decoration: underline }
+/* nav links and buttons subtle hover/focus motion */
+.nav-links .nav-link, .nav-links .btn { transition: color 0.14s ease, transform 0.12s ease, background 0.12s ease }
 .nav-links .btn:hover { transform: translateY(-2px); opacity: 0.98 }
-.app-header.hero-mode .btn.primary:hover { background: rgba(255,255,255,0.16); color: #fff }
 
-.btn { padding: 8px 12px; border-radius: 8px; border: 1px solid transparent; cursor: pointer; background: transparent }
-.btn.primary { background: var(--brand); color: white }
-.btn.ghost { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.12); color: var(--brand); padding:6px 8px }
-.btn.ghost:hover { background: rgba(239,68,68,0.12); transform: translateY(-2px); }
+.btn { padding: 8px 12px; border-radius: 8px; border: 1px solid transparent; cursor: pointer; background: transparent; color: var(--navbar-text) }
+.btn.primary { background: var(--brand); color: white; font-weight: 600 }
+.btn.primary:hover { opacity: 0.9; transform: translateY(-2px) }
+.btn.ghost { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.25); color: var(--brand); padding: 6px 8px }
+.btn.ghost:hover { background: rgba(239, 68, 68, 0.25); transform: translateY(-2px) }
 
 .app-main { padding: 20px; flex: 1 }
 
@@ -138,14 +152,16 @@
   .nav-links {
     flex-direction: column;
     gap: 12px;
-    align-items: flex-end;
-    padding-right: 6px;
+    align-items: flex-start;
+    padding-left: 6px;
     /* collapsed by default on mobile; will expand when .open is present */
     max-height: 0;
     overflow: hidden;
     transition: max-height .28s ease, padding .18s ease;
     padding-top: 0;
   }
+  /* when hamburger moves to the right, give it a small left gap */
+  .nav-toggle { display: block; margin-left: 8px; margin-right: 0 }
   .nav-links.open { max-height: 720px; padding-top: 8px }
   .nav-link { padding: 10px 12px; display: block; width: 100% }
 

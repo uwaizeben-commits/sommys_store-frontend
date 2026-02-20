@@ -77,7 +77,7 @@ export default function Cart() {
                 <span>Total</span>
                 <span>${total.toFixed(2)}</span>
               </div>
-              <button className="btn primary" onClick={() => alert('Checkout not configured in demo')}>Proceed to Checkout</button>
+              <Link to="/checkout" className="btn primary" style={{ display: 'block', textAlign: 'center' }}>Proceed to Checkout</Link>
             </div>
           </aside>
         </div>
