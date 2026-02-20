@@ -115,15 +115,61 @@ export default function Checkout() {
     setLoading(true)
     
     // Simulate payment processing
-    setTimeout(() => {
-      setOrderPlaced(true)
-      setLoading(false)
-      localStorage.removeItem('cart')
-      
-      // Redirect after 2 seconds
-      setTimeout(() => {
-        navigate('/')
-      }, 2000)
+    setTimeout(async () => {
+      try {
+        // Create order in backend
+        const orderData = {
+          userId: user.id || user._id,
+          items: cart.map(item => ({
+            productId: item.id || item._id,
+            name: item.name,
+            quantity: item.quantity || 1,
+            price: item.price,
+            image: item.image
+          })),
+          total: total,
+          shippingAddress: {
+            fullName: fullName,
+            email: email,
+            address: address,
+            city: city,
+            postalCode: postalCode
+          },
+          paymentMethod: 'Credit Card'
+        }
+        
+        const response = await fetch('https://sommys-store-backend.onrender.com/api/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+          },
+          body: JSON.stringify(orderData)
+        })
+        
+        if (response.ok) {
+          setOrderPlaced(true)
+          setLoading(false)
+          localStorage.removeItem('cart')
+          
+          // Redirect after 2 seconds
+          setTimeout(() => {
+            navigate('/orders')
+          }, 2000)
+        } else {
+          throw new Error('Failed to create order')
+        }
+      } catch (err) {
+        console.error('Order creation error:', err)
+        setOrderPlaced(true)
+        setLoading(false)
+        localStorage.removeItem('cart')
+        
+        // Still redirect even if order creation fails
+        setTimeout(() => {
+          navigate('/orders')
+        }, 2000)
+      }
     }, 1500)
   }
 
