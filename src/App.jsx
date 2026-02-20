@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { createHashRouter, RouterProvider, Link, Outlet, useLocation } from 'react-router-dom'
+import { createHashRouter, RouterProvider, Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
 import Recover from './pages/Recover'
@@ -34,7 +34,9 @@ function Layout() {
   const [navOpen, setNavOpen] = useState(false)
   const [email, setEmail] = useState('')
   const [subscribed, setSubscribed] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const location = useLocation()
+  const navigate = useNavigate()
 
   useEffect(() => {
     try {
@@ -85,6 +87,15 @@ function Layout() {
     window.addEventListener('cart:change', onCartChange)
     return () => window.removeEventListener('cart:change', onCartChange)
   }, [])
+
+  function handleSearch(e) {
+    if (e.key === 'Enter' && searchQuery.trim()) {
+      // Store search query and navigate to products page
+      sessionStorage.setItem('searchQuery', searchQuery)
+      navigate('/products')
+      setSearchQuery('')
+    }
+  }
 
   function handleSubscribe(e) {
     e.preventDefault()
@@ -142,7 +153,7 @@ function Layout() {
           </button>
         </div>
         <div className="header-center">
-          <input className="search" placeholder="Search products, categories..." />
+          <input className="search" placeholder="Search products, categories..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={handleSearch} />
         </div>
         <div className="header-right">
           <nav className={`nav-links${navOpen ? ' open' : ''}`} onClick={() => setNavOpen(false)}>

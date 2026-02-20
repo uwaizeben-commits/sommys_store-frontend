@@ -7,7 +7,8 @@ export default function AdminDashboard() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(false)
   const [editId, setEditId] = useState(null)
-  const [form, setForm] = useState({ name: '', price: 1, quantity: 0, description: '', images: [], imageUrl: '' })
+  const [form, setForm] = useState({ name: '', price: 1, quantity: 0, description: '', category: '', images: [], imageUrl: '' })
+  const CATEGORIES = ['Bags', 'Shoes', 'T-Shirts', 'Shirts', 'Polo', 'Boxers', 'Caps', 'Hoodies']
   const [error, setError] = useState('')
   const [useImageUrl, setUseImageUrl] = useState(true)
   const fileInputRef = React.useRef(null)
@@ -49,6 +50,7 @@ export default function AdminDashboard() {
         name: form.name,
         price: Number(form.price),
         quantity: Number(form.quantity),
+        category: form.category,
         description: form.description,
         images: form.images && form.images.length > 0 ? form.images : (form.imageUrl ? [form.imageUrl] : [])
       }
@@ -69,7 +71,7 @@ export default function AdminDashboard() {
         throw new Error(msg)
       }
       await fetchProducts()
-      setForm({ name: '', price: 1, quantity: 0, description: '', images: [], imageUrl: '' })
+      setForm({ name: '', price: 1, quantity: 0, description: '', category: '', images: [], imageUrl: '' })
       setEditId(null)
     } catch (err) {
       setError(err.message)
@@ -108,6 +110,7 @@ export default function AdminDashboard() {
       name: p.name,
       price: p.price,
       quantity: p.quantity || 0,
+      category: p.category || '',
       description: p.description || '',
       images: images,
       imageUrl: firstImage
@@ -166,6 +169,16 @@ export default function AdminDashboard() {
             </div>
 
             <div className="admin-form-group">
+              <label className="admin-label">Category</label>
+              <select value={form.category} onChange={e => setForm({...form, category: e.target.value})} style={{ width: '100%', padding: '10px', border: '1px solid #e0e0e0', borderRadius: '4px' }}>
+                <option value="">Select a category</option>
+                {CATEGORIES.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="admin-form-group">
               <label className="admin-label">Description</label>
               <textarea placeholder="Enter product description (details, features, size, etc)" value={form.description} onChange={e => setForm({...form, description: e.target.value})} rows="4" />
             </div>
@@ -200,7 +213,7 @@ export default function AdminDashboard() {
               <button type="submit" className="btn primary" disabled={loading}>
                 {loading ? 'Saving...' : editId ? 'Update Product' : 'Add Product'}
               </button>
-              {editId && <button type="button" className="btn ghost" onClick={() => { setEditId(null); setForm({ name: '', price: 1, quantity: 0, description: '', images: [], imageUrl: '' }); }}>Cancel</button>}
+              {editId && <button type="button" className="btn ghost" onClick={() => { setEditId(null); setForm({ name: '', price: 1, quantity: 0, description: '', category: '', images: [], imageUrl: '' }); }}>Cancel</button>}
             </div>
           </form>
         </div>
@@ -213,6 +226,7 @@ export default function AdminDashboard() {
                 {p.images && p.images[0] && <img src={p.images[0]} alt={p.name} className="admin-product-thumb" />}
                 <div className="admin-product-info">
                   <div className="admin-product-name">{p.name}</div>
+                  {p.category && <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Category: {p.category}</div>}
                   <div className="admin-product-meta">
                     <span className="admin-product-price">${(Number(p.price) || 0).toFixed(2)}</span>
                     <span className="admin-product-qty">Qty: {p.quantity || 0}</span>
