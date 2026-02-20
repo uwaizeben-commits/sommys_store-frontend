@@ -198,7 +198,7 @@ function Layout() {
                 <li><Link to="/">Home</Link></li>
                 <li><Link to="/cart">Cart</Link></li>
                 <li><Link to="/orders">Orders</Link></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><Link to="/about">About</Link></li>
               </ul>
             </nav>
           </div>
