@@ -29,6 +29,7 @@ function Layout() {
   const [cartCount, setCartCount] = useState(0)
   const [user, setUser] = useState(null)
   const [admin, setAdmin] = useState(null)
+  const [navOpen, setNavOpen] = useState(false)
   const [email, setEmail] = useState('')
   const [subscribed, setSubscribed] = useState(false)
   const location = useLocation()
@@ -120,13 +121,16 @@ function Layout() {
     <div className="app-root">
       <header className={`app-header ${onHero ? 'hero-mode' : ''}`}>
         <div className="header-left">
+          <button className="nav-toggle" aria-label={navOpen ? 'Close menu' : 'Open menu'} aria-expanded={navOpen} onClick={() => setNavOpen(v => !v)}>
+            <svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M0 1.5h22" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><path d="M0 7h22" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><path d="M0 12.5h22" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
+          </button>
           <Link to="/" className="logo">Sommy's Store</Link>
         </div>
         <div className="header-center">
           <input className="search" placeholder="Search products, categories..." />
         </div>
         <div className="header-right">
-          <nav className="nav-links">
+          <nav className={`nav-links${navOpen ? ' open' : ''}`} onClick={() => setNavOpen(false)}>
             <Link to="/" className="nav-link">Home</Link>
             <Link to="/products" className="nav-link">Products</Link>
             <Link to="/about" className="nav-link">About</Link>
