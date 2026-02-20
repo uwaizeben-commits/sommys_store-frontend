@@ -18,19 +18,20 @@ export default function Orders() {
   }, [])
 
   useEffect(() => {
-    if (!user || !user.id) {
+    const userId = user?.id || user?._id
+    if (!user || !userId) {
       setLoading(false)
       return
     }
 
     const fetchOrders = async () => {
       try {
-        const res = await fetch(`${ORDERS_API}/user/${user.id}`)
+        const res = await fetch(`${ORDERS_API}/user/${userId}`)
         if (!res.ok) throw new Error('Failed to fetch orders')
         const data = await res.json()
         setOrders(data.orders || [])
       } catch (err) {
-        console.error(err)
+        console.error('Error fetching orders:', err)
         setOrders([])
       } finally {
         setLoading(false)
@@ -64,7 +65,7 @@ export default function Orders() {
     }
   }
 
-  if (!user || !user.id) {
+  if (!user || (!user.id && !user._id)) {
     return (
       <div style={{ padding: '40px 20px', textAlign: 'center' }}>
         <h2>Orders</h2>
