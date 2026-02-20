@@ -168,13 +168,13 @@ function Layout() {
               <>
                 <span className="nav-link" aria-live="polite">Admin: {admin.email.split('@')[0]}</span>
                 <Link to="/admin/dashboard" className="btn primary">Dashboard</Link>
-                <button className="btn ghost" onClick={() => { localStorage.removeItem('admin'); setAdmin(null); window.dispatchEvent(new CustomEvent('admin:change', { detail: null })); }} >Admin Sign out</button>
+                <button className="btn ghost" onClick={() => { localStorage.removeItem('admin'); setAdmin(null); window.dispatchEvent(new CustomEvent('admin:change', { detail: null })); navigate('/'); }} >Admin Sign out</button>
               </>
             ) : user ? (
               <>
                 <span className="nav-link" aria-live="polite">Hi, {user.name || (user.email ? user.email.split('@')[0] : (user.phone || 'User'))}</span>
                 <Link to="/orders" className="nav-link">Orders</Link>
-                <button className="btn ghost" onClick={() => { localStorage.removeItem('user'); setUser(null); window.dispatchEvent(new CustomEvent('user:change', { detail: null })); }} >Sign out</button>
+                <button className="btn ghost" onClick={() => { localStorage.removeItem('user'); setUser(null); window.dispatchEvent(new CustomEvent('user:change', { detail: null })); navigate('/'); }} >Sign out</button>
               </>
             ) : (
               <Link to="/signin" className="btn primary">Sign in</Link>
