@@ -1,8 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import { createBrowserRouter, RouterProvider, Link, Outlet, useLocation } from 'react-router-dom'
+import SignIn from './pages/SignIn'
+import SignUp from './pages/SignUp'
+import Recover from './pages/Recover'
+import ResetPassword from './pages/ResetPassword'
+import ErrorPage from './pages/ErrorPage'
 import Home from './pages/Home'
 import Product from './pages/Product'
 import Cart from './pages/Cart'
+import About from './pages/About'
+import Products from './pages/Products'
+import AdminLogin from './pages/AdminLogin'
+import AdminDashboard from './pages/AdminDashboard'
 import './header.css'
 
 const SOCIAL_LINKS = {
@@ -18,6 +27,8 @@ const BACKEND_SUBSCRIBE_URL = ''
 
 function Layout() {
   const [cartCount, setCartCount] = useState(0)
+  const [user, setUser] = useState(null)
+  const [admin, setAdmin] = useState(null)
   const [email, setEmail] = useState('')
   const [subscribed, setSubscribed] = useState(false)
   const location = useLocation()
@@ -30,6 +41,36 @@ function Layout() {
     } catch (e) {
       setCartCount(0)
     }
+    try {
+      const u = JSON.parse(localStorage.getItem('user') || 'null')
+      if (u) setUser(u)
+    } catch (e) {}
+    try {
+      const a = JSON.parse(localStorage.getItem('admin') || 'null')
+      if (a) setAdmin(a)
+    } catch (e) {}
+  }, [])
+
+  useEffect(() => {
+    function onUserChange(e) {
+      try {
+        const u = e && e.detail ? e.detail : JSON.parse(localStorage.getItem('user') || 'null')
+        setUser(u)
+      } catch (err) { setUser(null) }
+    }
+    window.addEventListener('user:change', onUserChange)
+    return () => window.removeEventListener('user:change', onUserChange)
+  }, [])
+
+  useEffect(() => {
+    function onAdminChange(e) {
+      try {
+        const a = e && e.detail ? e.detail : JSON.parse(localStorage.getItem('admin') || 'null')
+        setAdmin(a)
+      } catch (err) { setAdmin(null) }
+    }
+    window.addEventListener('admin:change', onAdminChange)
+    return () => window.removeEventListener('admin:change', onAdminChange)
   }, [])
 
   function handleSubscribe(e) {
@@ -87,8 +128,22 @@ function Layout() {
         <div className="header-right">
           <nav className="nav-links">
             <Link to="/" className="nav-link">Home</Link>
+            <Link to="/products" className="nav-link">Products</Link>
+            <Link to="/about" className="nav-link">About</Link>
             <Link to="/cart" className="nav-link">Cart ({cartCount})</Link>
-            <button className="btn primary">Sign in</button>
+            {admin ? (
+              <>
+                <span className="nav-link" aria-live="polite">Admin: {admin.email.split('@')[0]}</span>
+                <button className="btn ghost" onClick={() => { localStorage.removeItem('admin'); setAdmin(null); window.dispatchEvent(new CustomEvent('admin:change', { detail: null })); }} >Admin Sign out</button>
+              </>
+            ) : user ? (
+              <>
+                <span className="nav-link" aria-live="polite">Hi, {user.email ? user.email.split('@')[0] : (user.phone || 'User')}</span>
+                <button className="btn ghost" onClick={() => { localStorage.removeItem('user'); setUser(null); window.dispatchEvent(new CustomEvent('user:change', { detail: null })); }} >Sign out</button>
+              </>
+            ) : (
+              <Link to="/signin" className="btn primary">Sign in</Link>
+            )}
           </nav>
         </div>
       </header>
@@ -146,10 +201,20 @@ const routerWithLayout = createBrowserRouter([
   {
     path: '/',
     element: <Layout />,
+    errorElement: <ErrorPage />,
     children: [
       { index: true, element: <Home /> },
+      { path: 'products', element: <Products /> },
+    { path: 'about', element: <About /> },
       { path: 'product/:id', element: <Product /> },
-      { path: 'cart', element: <Cart /> }
+      { path: 'cart', element: <Cart /> },
+      { path: 'signin', element: <SignIn /> },
+      { path: 'signup', element: <SignUp /> },
+      { path: 'recover', element: <Recover /> },
+      { path: 'reset/:token', element: <ResetPassword /> },
+      { path: 'admin/login', element: <AdminLogin /> },
+      { path: 'admin/dashboard', element: <AdminDashboard /> },
+      { path: '*', element: <ErrorPage /> }
     ]
   }
 ], { future: { v7_startTransition: true, v7_relativeSplatPath: true } })
