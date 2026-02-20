@@ -1,5 +1,26 @@
 # Frontend Environment Setup for Production
 
+## SPA Routing Setup (Important!)
+
+This is a React SPA using client-side routing. For clean URLs (e.g., `/admin/login` instead of `/#/admin/login`) to work on Render:
+
+1. **Vite Build**: The `npm run build` command outputs to the `dist/` folder.
+2. **Render Static Config**: The `render.yaml` file configures Render to:
+   - Build using `npm run build`
+   - Publish from the `dist/` folder  
+   - Rewrite all routes (`/*`) to `index.html` (React Router then handles client-side routing)
+
+This is **already configured**. When you push to GitHub, Render will automatically rebuild and redeploy.
+
+### Troubleshooting 404s:
+- In Render dashboard: Open your frontend service → **Settings** → **Publish directory** → Ensure it says `dist` (not `public`).
+- Trigger a **Manual Deploy** to force a rebuild.
+- Clear your browser cache and hard-refresh (Ctrl+Shift+R or Cmd+Shift+R).
+
+---
+
+## API Endpoints Setup
+
 Before deploying to Render, update API endpoints to use environment variables:
 
 ## Option A: Hardcoded URLs (Quick, but less flexible)
