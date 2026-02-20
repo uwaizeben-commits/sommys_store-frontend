@@ -10,6 +10,7 @@ import Product from './pages/Product'
 import Cart from './pages/Cart'
 import About from './pages/About'
 import Products from './pages/Products'
+import Orders from './pages/Orders'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import Checkout from './pages/Checkout'
@@ -172,6 +173,7 @@ function Layout() {
             ) : user ? (
               <>
                 <span className="nav-link" aria-live="polite">Hi, {user.name || (user.email ? user.email.split('@')[0] : (user.phone || 'User'))}</span>
+                <Link to="/orders" className="nav-link">Orders</Link>
                 <button className="btn ghost" onClick={() => { localStorage.removeItem('user'); setUser(null); window.dispatchEvent(new CustomEvent('user:change', { detail: null })); }} >Sign out</button>
               </>
             ) : (
@@ -195,7 +197,17 @@ function Layout() {
               <ul>
                 <li><Link to="/">Home</Link></li>
                 <li><Link to="/cart">Cart</Link></li>
+                <li><Link to="/orders">Orders</Link></li>
                 <li><a href="#contact">Contact</a></li>
+              </ul>
+            </nav>
+          </div>
+          <div className="col">
+            <h4>Policies</h4>
+            <nav aria-label="Policies">
+              <ul>
+                <li><a href="#terms" onClick={(e) => { e.preventDefault(); alert('Service Agreement\n\n1. TERMS OF SERVICE\nBy shopping at Sommy\'s Store, you agree to these terms and conditions.\n\n2. ORDERS & PURCHASES\nAll orders are subject to acceptance. We reserve the right to refuse or cancel any order.\n\n3. PRICING & AVAILABILITY\nPrices are subject to change. Product availability is not guaranteed until order confirmation.\n\n4. REFUNDS & CANCELLATIONS\nOrders can be cancelled within 24 hours of placement. A 3% cancellation fee will be deducted from refunds. Refunds are processed to the original payment method within 5-7 business days.\n\n5. SHIPPING & DELIVERY\nOrder status tracks: Pending → Dispatched → In Transit → Delivered. Delivery times are estimates and may be subject to delays.\n\n6. LIMITATION OF LIABILITY\nSommy\'s Store is not liable for indirect, incidental, or consequential damages from product use.\n\n7. INTELLECTUAL PROPERTY\nAll site content, images, and product descriptions are owned by Sommy\'s Store.\n\n8. PRIVACY & DATA\nYour personal data is protected and used only for order fulfillment and service improvement.\n\n9. MODIFICATIONS\nWe reserve the right to modify these terms at any time. Changes are effective upon posting.\n\n10. CONTACT\nFor support: hello@sommys.store'); }}>Terms of Service</a></li>
+                <li><a href="#privacy" onClick={(e) => { e.preventDefault(); alert('Privacy Policy\n\nAt Sommy\'s Store, your privacy is important to us. We collect minimal personal information needed for orders and customer service. Your data is never sold to third parties.'); }}>Privacy Policy</a></li>
               </ul>
             </nav>
           </div>
@@ -242,6 +254,7 @@ const routerWithLayout = createHashRouter([
       { path: 'product/:id', element: <Product /> },
       { path: 'cart', element: <Cart /> },
       { path: 'checkout', element: <Checkout /> },
+      { path: 'orders', element: <Orders /> },
       { path: 'signin', element: <SignIn /> },
       { path: 'signup', element: <SignUp /> },
       { path: 'recover', element: <Recover /> },
