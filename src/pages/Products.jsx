@@ -4,16 +4,39 @@ import { Link } from 'react-router-dom'
 export default function Products() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [sortBy, setSortBy] = useState('recommended')
+  const [allProducts, setAllProducts] = useState([])
 
   useEffect(() => {
     setLoading(true)
     const API_URL = 'https://sommys-store-backend.onrender.com/api/products'
     fetch(API_URL)
       .then((res) => res.json())
-      .then((data) => setProducts(data || []))
-      .catch(() => setProducts([]))
+      .then((data) => {
+        const productsList = data || []
+        setAllProducts(productsList)
+        setProducts(productsList)
+      })
+      .catch(() => {
+        setAllProducts([])
+        setProducts([])
+      })
       .finally(() => setLoading(false))
   }, [])
+
+  function sortProducts(option) {
+    setSortBy(option)
+    let sorted = [...allProducts]
+    
+    if (option === 'price-low') {
+      sorted.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0))
+    } else if (option === 'price-high') {
+      sorted.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0))
+    }
+    // 'recommended' keeps original order
+    
+    setProducts(sorted)
+  }
 
   function addToCart(p) {
     try {
@@ -38,7 +61,7 @@ export default function Products() {
 
       <div className="products-toolbar">
         <div className="results">{loading ? 'Loading...' : `${products.length} items`}</div>
-        <div className="sort">Sort: <select><option>Recommended</option><option>Price: Low to High</option><option>Price: High to Low</option></select></div>
+        <div className="sort">Sort: <select value={sortBy} onChange={(e) => sortProducts(e.target.value)}><option value="recommended">Recommended</option><option value="price-low">Price: Low to High</option><option value="price-high">Price: High to Low</option></select></div>
       </div>
 
       <div className="product-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px', marginBottom: '40px' }}>
