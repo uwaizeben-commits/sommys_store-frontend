@@ -21,7 +21,11 @@ export default function SignIn() {
         localStorage.setItem('user', JSON.stringify(user))
         // notify app layout that user changed
         try { window.dispatchEvent(new CustomEvent('user:change', { detail: user })) } catch (e) {}
-        navigate('/')
+        
+        // Redirect to return URL if it exists, otherwise home
+        const returnUrl = sessionStorage.getItem('returnUrl')
+        sessionStorage.removeItem('returnUrl')
+        navigate(returnUrl || '/')
         return
       }
 
@@ -44,7 +48,11 @@ export default function SignIn() {
       const userObj = { email: found.email, phone: found.phone }
       localStorage.setItem('user', JSON.stringify(userObj))
       try { window.dispatchEvent(new CustomEvent('user:change', { detail: userObj })) } catch (e) {}
-      navigate('/')
+      
+      // Redirect to return URL if it exists, otherwise home
+      const returnUrl = sessionStorage.getItem('returnUrl')
+      sessionStorage.removeItem('returnUrl')
+      navigate(returnUrl || '/')
     } catch (err) {
       setError(err.message || 'Sign in failed')
     }

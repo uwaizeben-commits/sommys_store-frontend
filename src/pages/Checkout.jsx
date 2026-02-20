@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
 import './checkout.css'
 
 export default function Checkout() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const [user, setUser] = useState(null)
   const [cart, setCart] = useState([])
   const [orderPlaced, setOrderPlaced] = useState(false)
 
@@ -24,6 +26,26 @@ export default function Checkout() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
+    // Check if user is logged in
+    try {
+      const userData = JSON.parse(localStorage.getItem('user') || 'null')
+      if (!userData) {
+        // Save the return URL and redirect to login
+        sessionStorage.setItem('returnUrl', location.pathname)
+        navigate('/signin')
+        return
+      }
+      setUser(userData)
+      
+      // Pre-fill email if user is logged in
+      if (userData.email && !email) {
+        setEmail(userData.email)
+      }
+    } catch (e) {
+      navigate('/signin')
+      return
+    }
+
     try {
       const cartData = JSON.parse(localStorage.getItem('cart') || '[]')
       setCart(cartData)
