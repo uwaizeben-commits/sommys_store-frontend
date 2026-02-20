@@ -60,7 +60,14 @@ export default function AdminDashboard() {
         headers,
         body: JSON.stringify(submitData)
       })
-      if (!res.ok) throw new Error(`Failed to ${editId ? 'update' : 'create'} product`)
+      if (!res.ok) {
+        let msg = `Failed to ${editId ? 'update' : 'create'} product`
+        try {
+          const data = await res.json()
+          if (data && data.message) msg = data.message
+        } catch (e) {}
+        throw new Error(msg)
+      }
       await fetchProducts()
       setForm({ name: '', price: 1, quantity: 0, description: '', images: [], imageUrl: '' })
       setEditId(null)
@@ -80,7 +87,11 @@ export default function AdminDashboard() {
 
     try {
       const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE', headers })
-      if (!res.ok) throw new Error('Failed to delete')
+        if (!res.ok) {
+          let msg = 'Failed to delete'
+          try { const data = await res.json(); if (data && data.message) msg = data.message } catch (e) {}
+          throw new Error(msg)
+        }
       await fetchProducts()
     } catch (err) {
       setError(err.message)
