@@ -15,11 +15,9 @@ export default function SignIn() {
 
     try {
       if (AUTH_SIGNIN_URL) {
-        // Backend login only supports email-based sign-in.
-        if (!identifier.includes('@')) return setError('Please sign in with your email address')
-        const res = await fetch(AUTH_SIGNIN_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: identifier, password }) })
+        // Backend accepts either email or phone as `identifier`
+        const res = await fetch(AUTH_SIGNIN_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ identifier, password }) })
         if (!res.ok) {
-          // Try to read server message for more context
           let msg = 'Invalid credentials'
           try { const j = await res.json(); if (j && j.message) msg = j.message } catch (e) {}
           throw new Error(msg)

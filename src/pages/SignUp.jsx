@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 
 const AUTH_SIGNUP_URL = 'https://sommys-store-backend.onrender.com/api/auth/register'
 export default function SignUp() {
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
@@ -13,12 +14,12 @@ export default function SignUp() {
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
-    if (!email || !phone || !password) return setError('Please complete all fields')
+    if (!name || !email || !phone || !password) return setError('Please complete all fields')
     if (password !== confirm) return setError('Passwords do not match')
 
     try {
       if (AUTH_SIGNUP_URL) {
-        const res = await fetch(AUTH_SIGNUP_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, phone, password }) })
+        const res = await fetch(AUTH_SIGNUP_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, phone, password }) })
         if (!res.ok) throw new Error('Signup failed')
         const resp = await res.json()
         const user = resp.user || resp
@@ -30,9 +31,9 @@ export default function SignUp() {
 
       const users = JSON.parse(localStorage.getItem('users') || '[]')
       if (users.find(u => u.email === email || u.phone === phone)) return setError('User already exists')
-      users.push({ email, phone, password })
+      users.push({ name, email, phone, password })
       localStorage.setItem('users', JSON.stringify(users))
-      const userObj = { email, phone, name: '' }
+      const userObj = { name, email, phone }
       localStorage.setItem('user', JSON.stringify(userObj))
       try { window.dispatchEvent(new CustomEvent('user:change', { detail: userObj })) } catch (e) {}
       navigate('/')
@@ -50,6 +51,9 @@ export default function SignUp() {
         </div>
         <div className="auth-right">
           <form className="auth-form" onSubmit={handleSubmit} noValidate>
+            <label className="label" htmlFor="signup-name">Full name</label>
+            <input id="signup-name" name="name" className="input" value={name} onChange={e => setName(e.target.value)} placeholder="Your full name" autoComplete="name" required />
+
             <label className="label" htmlFor="signup-email">Email</label>
             <input id="signup-email" name="email" className="input" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" required />
 
