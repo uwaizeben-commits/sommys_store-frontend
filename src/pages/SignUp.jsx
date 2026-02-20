@@ -20,7 +20,11 @@ export default function SignUp() {
     try {
       if (AUTH_SIGNUP_URL) {
         const res = await fetch(AUTH_SIGNUP_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, phone, password }) })
-        if (!res.ok) throw new Error('Signup failed')
+        if (!res.ok) {
+          let msg = 'Signup failed'
+          try { const j = await res.json(); if (j && j.message) msg = j.message } catch (e) {}
+          throw new Error(msg)
+        }
         const resp = await res.json()
         const user = resp.user || resp
         localStorage.setItem('user', JSON.stringify(user))
@@ -30,7 +34,7 @@ export default function SignUp() {
       }
 
       const users = JSON.parse(localStorage.getItem('users') || '[]')
-      if (users.find(u => u.email === email || u.phone === phone)) return setError('User already exists')
+      if (users.find(u => u.email === email || u.phone === phone)) return setError('Already a member')
       users.push({ name, email, phone, password })
       localStorage.setItem('users', JSON.stringify(users))
       const userObj = { name, email, phone }
