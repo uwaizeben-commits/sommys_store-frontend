@@ -40,7 +40,7 @@ export default function Cart() {
       {cart.length === 0 ? (
         <div className="cart-empty">
           <p>Your cart is empty.</p>
-          <Link to="/" className="btn primary">Start shopping</Link>
+          <Link to="/products" className="btn primary">Start shopping</Link>
         </div>
       ) : (
         <div className="cart-grid">
