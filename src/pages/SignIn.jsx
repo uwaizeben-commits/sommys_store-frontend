@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
-const AUTH_SIGNIN_URL = 'http://localhost:5001/api/auth/login'
+const AUTH_SIGNIN_URL = 'https://sommys-store-backend.onrender.com/api/auth/login'
 export default function SignIn() {
   const [identifier, setIdentifier] = useState('') // email or phone
   const [password, setPassword] = useState('')

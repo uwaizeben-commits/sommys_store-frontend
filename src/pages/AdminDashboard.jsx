@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const API_URL = 'http://localhost:5001/api/products'
+const API_URL = 'https://sommys-store-backend.onrender.com/api/products'
 
 export default function AdminDashboard() {
   const [products, setProducts] = useState([])

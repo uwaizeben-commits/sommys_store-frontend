@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 
-const ADMIN_LOGIN_URL = 'http://localhost:5001/api/auth/admin/login'
-const ADMIN_REGISTER_URL = 'http://localhost:5001/api/auth/admin/register'
+const ADMIN_LOGIN_URL = 'https://sommys-store-backend.onrender.com/api/auth/admin/login'
+const ADMIN_REGISTER_URL = 'https://sommys-store-backend.onrender.com/api/auth/admin/register'
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('')
