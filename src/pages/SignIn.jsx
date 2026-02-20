@@ -16,7 +16,15 @@ export default function SignIn() {
     try {
       if (AUTH_SIGNIN_URL) {
         // Backend accepts either email or phone as `identifier`
-        const res = await fetch(AUTH_SIGNIN_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ identifier, password }) })
+        // If identifier is a phone (no @), prepend +234
+        let loginId = identifier
+        if (loginId && !loginId.includes('@')) {
+          // It's a phone; normalize by removing leading 0 and prepend +234
+          loginId = loginId.replace(/^0+/, '')
+          if (!loginId.startsWith('234')) loginId = '234' + loginId
+          loginId = loginId.replace(/^234/, '')
+        }
+        const res = await fetch(AUTH_SIGNIN_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ identifier: loginId, password }) })
         if (!res.ok) {
           let msg = 'Invalid credentials'
           try { const j = await res.json(); if (j && j.message) msg = j.message } catch (e) {}
@@ -75,7 +83,15 @@ export default function SignIn() {
         <div className="auth-right">
           <form className="auth-form" onSubmit={handleSubmit} noValidate>
             <label className="label" htmlFor="signin-identifier">Email or phone</label>
-            <input id="signin-identifier" name="identifier" className="input" value={identifier} onChange={e => setIdentifier(e.target.value)} placeholder="you@example.com or +2348012345678" autoComplete="username" required />
+            <input id="signin-identifier" name="identifier" className="input" value={identifier} onChange={(e) => {
+              let val = e.target.value
+              // If user is typing a phone (no @), filter to digits and auto-prepend +234
+              if (!val.includes('@')) {
+                val = val.replace(/\D/g, '')
+                if (val && !val.startsWith('234')) val = val.replace(/^0+/, '')
+              }
+              setIdentifier(val)
+            }} placeholder="you@example.com or 8012345678" autoComplete="username" required />
 
             <label className="label" htmlFor="signin-password">Password</label>
             <input id="signin-password" name="password" type="password" className="input" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" autoComplete="current-password" required />

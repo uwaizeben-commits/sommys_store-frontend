@@ -19,7 +19,9 @@ export default function SignUp() {
 
     try {
       if (AUTH_SIGNUP_URL) {
-        const res = await fetch(AUTH_SIGNUP_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, phone, password }) })
+        // Prepend country code +234 to phone (remove leading 0 if present)
+        const normalizedPhone = phone ? '234' + phone.replace(/^0+/, '') : ''
+        const res = await fetch(AUTH_SIGNUP_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, phone: normalizedPhone, password }) })
         if (!res.ok) {
           let msg = 'Signup failed'
           try { const j = await res.json(); if (j && j.message) msg = j.message } catch (e) {}
@@ -34,10 +36,11 @@ export default function SignUp() {
       }
 
       const users = JSON.parse(localStorage.getItem('users') || '[]')
-      if (users.find(u => u.email === email || u.phone === phone)) return setError('Already a member')
-      users.push({ name, email, phone, password })
+      const normalizedPhone = phone ? '234' + phone.replace(/^0+/, '') : ''
+      if (users.find(u => u.email === email || u.phone === normalizedPhone)) return setError('Already a member')
+      users.push({ name, email, phone: normalizedPhone, password })
       localStorage.setItem('users', JSON.stringify(users))
-      const userObj = { name, email, phone }
+      const userObj = { name, email, phone: normalizedPhone }
       localStorage.setItem('user', JSON.stringify(userObj))
       try { window.dispatchEvent(new CustomEvent('user:change', { detail: userObj })) } catch (e) {}
       navigate('/')
@@ -62,7 +65,10 @@ export default function SignUp() {
             <input id="signup-email" name="email" className="input" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" required />
 
             <label className="label" htmlFor="signup-phone">Phone</label>
-            <input id="signup-phone" name="phone" className="input" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+2348012345678" autoComplete="tel" required />
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <input type="text" value="+234" disabled style={{ width: '70px', borderRadius: '4px', border: '1px solid #ccc', padding: '10px', backgroundColor: '#f5f5f5', cursor: 'not-allowed', flex: 0 }} />
+              <input id="signup-phone" name="phone" className="input" value={phone} onChange={e => setPhone(e.target.value.replace(/\D/g, ''))} placeholder="8012345678" type="tel" inputMode="numeric" autoComplete="tel" required style={{ flex: 1 }} />
+            </div>
 
             <label className="label" htmlFor="signup-password">Password</label>
             <input id="signup-password" name="password" type="password" className="input" value={password} onChange={e => setPassword(e.target.value)} placeholder="Create a password" autoComplete="new-password" required />
