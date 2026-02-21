@@ -33,7 +33,13 @@ function Slider({ slides = [], interval = 4000 }) {
         <div className="hero-text">
           <h2>{s.title}</h2>
           <p>{s.subtitle}</p>
-          <Link to="/" className="hero-cta">Shop {s.title}</Link>
+          <Link 
+            to="/products" 
+            onClick={() => sessionStorage.setItem('searchQuery', s.category)}
+            className="hero-cta"
+          >
+            Shop {s.title}
+          </Link>
         </div>
         <div className="hero-controls">
           <button aria-label="prev" onClick={() => go(-1)} className="ctrl">‹</button>
@@ -63,16 +69,19 @@ export default function Home() {
   const slides = [
     {
       title: 'Clothes',
+      category: 'Shirts',
       subtitle: 'Comfortable tees, hoodies and more — crafted for everyday wear.',
       image: clothesImg
     },
     {
       title: 'Bags',
+      category: 'Bags',
       subtitle: 'Stylish totes and backpacks for every occasion.',
       image: bagsImg
     },
     {
       title: 'Shoes',
+      category: 'Shoes',
       subtitle: 'From classic sneakers to polished boots.',
       image: shoesImg
     }
