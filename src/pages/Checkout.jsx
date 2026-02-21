@@ -165,10 +165,13 @@ export default function Checkout() {
         })
         
         if (response.ok) {
+          // Clear cart immediately before any redirects
+          localStorage.removeItem('cart')
+          setCart([])
+          try { window.dispatchEvent(new CustomEvent('cart:change', { detail: [] })) } catch (e) {}
+          
           setOrderPlaced(true)
           setLoading(false)
-          localStorage.removeItem('cart')
-          try { window.dispatchEvent(new CustomEvent('cart:change', { detail: [] })) } catch (e) {}
 
           // Redirect after 2 seconds
           setTimeout(() => {
