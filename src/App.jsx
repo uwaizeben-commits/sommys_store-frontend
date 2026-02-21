@@ -36,6 +36,8 @@ function Layout() {
   const [email, setEmail] = useState('')
   const [subscribed, setSubscribed] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [showTerms, setShowTerms] = useState(false)
+  const [showPrivacy, setShowPrivacy] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -206,8 +208,8 @@ function Layout() {
             <h4>Policies</h4>
             <nav aria-label="Policies">
               <ul>
-                <li><a href="#terms" onClick={(e) => { e.preventDefault(); alert('Service Agreement\n\n1. TERMS OF SERVICE\nBy shopping at Sommy\'s Store, you agree to these terms and conditions.\n\n2. ORDERS & PURCHASES\nAll orders are subject to acceptance. We reserve the right to refuse or cancel any order.\n\n3. PRICING & AVAILABILITY\nPrices are subject to change. Product availability is not guaranteed until order confirmation.\n\n4. REFUNDS & CANCELLATIONS\nOrders can be cancelled within 24 hours of placement. A 3% cancellation fee will be deducted from refunds. Refunds are processed to the original payment method within 5-7 business days.\n\n5. SHIPPING & DELIVERY\nOrder status tracks: Pending → Dispatched → In Transit → Delivered. Delivery times are estimates and may be subject to delays.\n\n6. LIMITATION OF LIABILITY\nSommy\'s Store is not liable for indirect, incidental, or consequential damages from product use.\n\n7. INTELLECTUAL PROPERTY\nAll site content, images, and product descriptions are owned by Sommy\'s Store.\n\n8. PRIVACY & DATA\nYour personal data is protected and used only for order fulfillment and service improvement.\n\n9. MODIFICATIONS\nWe reserve the right to modify these terms at any time. Changes are effective upon posting.\n\n10. CONTACT\nFor support: hello@sommys.store'); }}>Terms of Service</a></li>
-                <li><a href="#privacy" onClick={(e) => { e.preventDefault(); alert('Privacy Policy\n\nAt Sommy\'s Store, your privacy is important to us. We collect minimal personal information needed for orders and customer service. Your data is never sold to third parties.'); }}>Privacy Policy</a></li>
+                <li><a href="#terms" onClick={(e) => { e.preventDefault(); setShowTerms(true); }}>Terms of Service</a></li>
+                <li><a href="#privacy" onClick={(e) => { e.preventDefault(); setShowPrivacy(true); }}>Privacy Policy</a></li>
               </ul>
             </nav>
           </div>
@@ -238,6 +240,77 @@ function Layout() {
         </div>
         <div className="footer-bottom">© {new Date().getFullYear()} Sommy's Store — All rights reserved.</div>
       </footer>
+
+      {/* Terms Modal */}
+      {showTerms && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            padding: '24px',
+            maxWidth: '600px',
+            width: '90%',
+            maxHeight: '80vh',
+            overflowY: 'auto'
+          }}>
+            <h2>Sommy's Store Says</h2>
+            <h3>Service Agreement</h3>
+            <p><strong>1. TERMS OF SERVICE</strong><br/>By shopping at Sommy's Store, you agree to these terms and conditions.</p>
+            <p><strong>2. ORDERS & PURCHASES</strong><br/>All orders are subject to acceptance. We reserve the right to refuse or cancel any order.</p>
+            <p><strong>3. PRICING & AVAILABILITY</strong><br/>Prices are subject to change. Product availability is not guaranteed until order confirmation.</p>
+            <p><strong>4. REFUNDS & CANCELLATIONS</strong><br/>Orders can be cancelled within 24 hours of placement. A 3% cancellation fee will be deducted from refunds. Refunds are processed to the original payment method within 5-7 business days.</p>
+            <p><strong>5. SHIPPING & DELIVERY</strong><br/>Order status tracks: Pending → Dispatched → In Transit → Delivered. Delivery times are estimates and may be subject to delays.</p>
+            <p><strong>6. LIMITATION OF LIABILITY</strong><br/>Sommy's Store is not liable for indirect, incidental, or consequential damages from product use.</p>
+            <p><strong>7. INTELLECTUAL PROPERTY</strong><br/>All site content, images, and product descriptions are owned by Sommy's Store.</p>
+            <p><strong>8. PRIVACY & DATA</strong><br/>Your personal data is protected and used only for order fulfillment and service improvement.</p>
+            <p><strong>9. MODIFICATIONS</strong><br/>We reserve the right to modify these terms at any time. Changes are effective upon posting.</p>
+            <p><strong>10. CONTACT</strong><br/>For support: hello@sommys.store</p>
+            <button className="btn primary" onClick={() => setShowTerms(false)} style={{marginTop: 16, width: '100%'}}>OK</button>
+          </div>
+        </div>
+      )}
+
+      {/* Privacy Policy Modal */}
+      {showPrivacy && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            padding: '24px',
+            maxWidth: '600px',
+            width: '90%',
+            maxHeight: '80vh',
+            overflowY: 'auto'
+          }}>
+            <h2>Sommy's Store Says</h2>
+            <h3>Privacy Policy</h3>
+            <p>At Sommy's Store, your privacy is important to us. We collect minimal personal information needed for orders and customer service. Your data is never sold to third parties.</p>
+            <button className="btn primary" onClick={() => setShowPrivacy(false)} style={{marginTop: 16, width: '100%'}}>OK</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

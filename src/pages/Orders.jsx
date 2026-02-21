@@ -9,6 +9,7 @@ export default function Orders() {
   const [user, setUser] = useState(null)
   const [cancelModalOrder, setCancelModalOrder] = useState(null)
   const [cancelError, setCancelError] = useState('')
+  const [cancelSuccess, setCancelSuccess] = useState('')
 
   useEffect(() => {
     try {
@@ -48,6 +49,7 @@ export default function Orders() {
   async function handleCancel(orderId) {
     if (!cancelModalOrder) return
     setCancelError('')
+    setCancelSuccess('')
     try {
       const res = await fetch(`${ORDERS_API}/${orderId}/cancel`, { method: 'POST' })
       if (!res.ok) {
@@ -59,7 +61,8 @@ export default function Orders() {
       // Refresh orders
       setOrders(orders.map(o => o._id === orderId ? { ...o, status: 'cancelled', cancellationFee: data.cancellationFee } : o))
       setCancelModalOrder(null)
-      alert(`Order cancelled. 3% fee ($${data.cancellationFee}) deducted. Refund of $${data.refundAmount} will be sent to your payment method within 5-7 business days.`)
+      setCancelSuccess(`Order cancelled. 3% fee ($${data.cancellationFee}) deducted. Refund of $${data.refundAmount} will be sent to your payment method within 5-7 business days.`)
+      setTimeout(() => setCancelSuccess(''), 5000)
     } catch (err) {
       setCancelError(err.message || 'Error cancelling order')
     }
@@ -94,6 +97,24 @@ export default function Orders() {
 
   return (
     <div style={{ padding: '40px 20px', maxWidth: '1200px', margin: '0 auto' }}>
+      {cancelSuccess && (
+        <div style={{
+          position: 'fixed',
+          top: 16,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 2000,
+          padding: '12px 16px',
+          borderRadius: 8,
+          boxShadow: '0 8px 24px rgba(2,6,23,0.12)',
+          background: '#ecfdf5',
+          color: '#065f46',
+          border: '1px solid #10b981',
+          fontWeight: 600,
+          fontSize: '0.95rem',
+          maxWidth: '90vw'
+        }}>✓ {cancelSuccess}</div>
+      )}
       <h2 style={{ marginBottom: '30px' }}>Your Orders</h2>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
