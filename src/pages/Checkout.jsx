@@ -8,6 +8,7 @@ export default function Checkout() {
   const [user, setUser] = useState(null)
   const [cart, setCart] = useState([])
   const [orderPlaced, setOrderPlaced] = useState(false)
+  const [orderError, setOrderError] = useState('')
 
   // Form states
   const [email, setEmail] = useState('')
@@ -24,6 +25,22 @@ export default function Checkout() {
   
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    let t
+    if (orderError) {
+      t = setTimeout(() => setOrderError(''), 6000)
+    }
+    return () => clearTimeout(t)
+  }, [orderError])
+
+  useEffect(() => {
+    let t
+    if (orderPlaced) {
+      t = setTimeout(() => setOrderPlaced(false), 4000)
+    }
+    return () => clearTimeout(t)
+  }, [orderPlaced])
 
   useEffect(() => {
     // Check if user is logged in
@@ -151,24 +168,26 @@ export default function Checkout() {
           setOrderPlaced(true)
           setLoading(false)
           localStorage.removeItem('cart')
-          
+          try { window.dispatchEvent(new CustomEvent('cart:change', { detail: [] })) } catch (e) {}
+
           // Redirect after 2 seconds
           setTimeout(() => {
             navigate('/orders')
           }, 2000)
         } else {
-          throw new Error('Failed to create order')
+          // Try to surface server message
+          let msg = 'Failed to create order'
+          try {
+            const json = await response.json()
+            if (json && json.message) msg = json.message
+          } catch (e) {}
+          setOrderError(msg)
+          setLoading(false)
         }
       } catch (err) {
         console.error('Order creation error:', err)
-        setOrderPlaced(true)
+        setOrderError(err.message || 'Order creation failed')
         setLoading(false)
-        localStorage.removeItem('cart')
-        
-        // Still redirect even if order creation fails
-        setTimeout(() => {
-          navigate('/orders')
-        }, 2000)
       }
     }, 1500)
   }
@@ -185,22 +204,28 @@ export default function Checkout() {
     )
   }
 
-  if (orderPlaced) {
-    return (
-      <div className="checkout-page">
-        <div className="order-success">
-          <div className="success-icon">✓</div>
-          <h1>Order Placed Successfully!</h1>
-          <p>Thank you for your purchase. Your order has been confirmed.</p>
-          <p className="order-id">Order ID: #{Math.random().toString(36).substr(2, 9).toUpperCase()}</p>
-          <p className="redirect-msg">Redirecting to home...</p>
-        </div>
-      </div>
-    )
-  }
+  // Temporary inline notifications (toast)
+  const Notification = ({ type, message }) => (
+    <div style={{
+      position: 'fixed',
+      top: 16,
+      left: '50%',
+      transform: 'translateX(-50%)',
+      zIndex: 2000,
+      padding: '10px 14px',
+      borderRadius: 8,
+      boxShadow: '0 8px 24px rgba(2,6,23,0.12)',
+      background: type === 'success' ? '#ecfdf5' : '#fff1f2',
+      color: type === 'success' ? '#065f46' : '#7f1d1d',
+      border: type === 'success' ? '1px solid #10b981' : '1px solid #ef4444',
+      fontWeight: 600
+    }}>{message}</div>
+  )
 
   return (
     <div className="checkout-page">
+      {orderPlaced && <Notification type="success" message={`Order placed — redirecting to Orders...`} />}
+      {orderError && <Notification type="error" message={orderError} />}
       <div className="checkout-container">
         <div className="checkout-main">
           <h1>Checkout</h1>

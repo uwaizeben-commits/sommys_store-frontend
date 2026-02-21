@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import './cart.css'
 import { Link } from 'react-router-dom'
 
 export default function Cart() {
@@ -82,6 +83,16 @@ export default function Cart() {
               <Link to="/checkout" className="btn primary" style={{ display: 'block', textAlign: 'center' }}>Proceed to Checkout</Link>
             </div>
           </aside>
+        </div>
+      )}
+
+      {cart.length > 0 && (
+        <div className="mobile-checkout-bar" aria-hidden={false}>
+          <div className="mobile-info">
+            <div style={{fontSize: '0.95rem', color: '#374151'}}>Items: {cart.reduce((s, i) => s + (i.quantity || 0), 0)}</div>
+            <div style={{fontWeight:700, fontSize: '1rem', color: '#0f172a'}}>${total.toFixed(2)}</div>
+          </div>
+          <Link to="/checkout" className="btn primary">Checkout</Link>
         </div>
       )}
     </div>

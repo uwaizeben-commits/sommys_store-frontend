@@ -127,6 +127,13 @@ export default function AdminDashboard() {
       return
     }
 
+    // Check file size (max 5MB per image)
+    const MAX_SIZE = 5 * 1024 * 1024 // 5MB
+    if (file.size > MAX_SIZE) {
+      setError(`Image file is too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Max size is 5MB.`)
+      return
+    }
+
     const reader = new FileReader()
     reader.onload = (event) => {
       const imageUrl = event.target?.result
