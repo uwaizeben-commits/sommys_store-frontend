@@ -7,6 +7,18 @@
   --navbar-text: #f5f7fa;
 }
 
+/* Navbar animations */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 2px 8px rgba(15, 39, 65, 0.1), 0 0 20px rgba(239, 68, 68, 0); }
+  50% { box-shadow: 0 2px 8px rgba(15, 39, 65, 0.15), 0 0 30px rgba(239, 68, 68, 0.08); }
+}
+
 /* Base layout */
 .app-root {
   font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
@@ -20,11 +32,12 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 20px;
-  border-bottom: 1px solid rgba(245, 247, 250, 0.1);
-  background: var(--navbar-bg);
+  border-bottom: 1px solid rgba(239, 68, 68, 0.15);
+  background: linear-gradient(135deg, #0f2741 0%, #1a3a52 25%, #124561 50%, #1a3a52 75%, #0f2741 100%);
+  background-size: 400% 400%;
   position: relative;
   z-index: 2;
-  box-shadow: 0 2px 8px rgba(15, 39, 65, 0.1);
+  animation: gradientShift 8s ease infinite, glowPulse 6s ease-in-out infinite;
 }
 .logo {
   display: inline-flex;
