@@ -2,12 +2,17 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const API_URL = 'https://sommys-store-backend.onrender.com/api/products'
+const ORDERS_API = 'https://sommys-store-backend.onrender.com/api/orders'
 
 export default function AdminDashboard() {
+  const [tab, setTab] = useState('products') // 'products' or 'orders'
   const [products, setProducts] = useState([])
+  const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(false)
   const [editId, setEditId] = useState(null)
   const [form, setForm] = useState({ name: '', price: 1, quantity: 0, description: '', category: '', images: [], imageUrl: '' })
+  const [editingOrder, setEditingOrder] = useState(null)
+  const [orderStatusForm, setOrderStatusForm] = useState({ status: '', dispatchDate: '', departureDate: '', deliveryDate: '' })
   const CATEGORIES = ['Bags', 'Shoes', 'T-Shirts', 'Shirts', 'Polo', 'Boxers', 'Caps', 'Hoodies']
   const [error, setError] = useState('')
   const [useImageUrl, setUseImageUrl] = useState(true)
@@ -17,11 +22,11 @@ export default function AdminDashboard() {
   useEffect(() => {
     const admin = JSON.parse(localStorage.getItem('admin') || 'null')
     if (!admin) {
-      // Redirect to admin login if not authenticated
       navigate('/admin/login')
       return
     }
     fetchProducts()
+    fetchOrders()
   }, [navigate])
 
   async function fetchProducts() {
@@ -31,6 +36,16 @@ export default function AdminDashboard() {
       setProducts(Array.isArray(data) ? data : [])
     } catch (err) {
       setError('Failed to load products')
+    }
+  }
+
+  async function fetchOrders() {
+    try {
+      const res = await fetch(`${ORDERS_API}/admin/all`)
+      const data = await res.json()
+      setOrders(Array.isArray(data.orders) ? data.orders : [])
+    } catch (err) {
+      console.error('Failed to load orders:', err)
     }
   }
 
@@ -145,20 +160,63 @@ export default function AdminDashboard() {
     reader.readAsDataURL(file)
   }
 
+  async function updateOrderStatus(orderId) {
+    if (!orderId) return
+    setError('')
+    setLoading(true)
+    const admin = JSON.parse(localStorage.getItem('admin') || '{}')
+    const headers = { 'Content-Type': 'application/json' }
+    if (admin.token) headers['Authorization'] = `Bearer ${admin.token}`
+
+    try {
+      const updateData = {}
+      if (orderStatusForm.status) updateData.status = orderStatusForm.status
+      if (orderStatusForm.dispatchDate) updateData.dispatchDate = orderStatusForm.dispatchDate
+      if (orderStatusForm.departureDate) updateData.departureDate = orderStatusForm.departureDate
+      if (orderStatusForm.deliveryDate) updateData.deliveryDate = orderStatusForm.deliveryDate
+
+      const res = await fetch(`${ORDERS_API}/${orderId}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(updateData)
+      })
+      if (!res.ok) throw new Error('Failed to update order')
+      
+      await fetchOrders()
+      setEditingOrder(null)
+      setOrderStatusForm({ status: '', dispatchDate: '', departureDate: '', deliveryDate: '' })
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function formatDate(date) {
+    if (!date) return 'TBA'
+    return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+  }
+
   return (
     <div className="admin-dashboard">
       <div className="admin-header">
         <h1>Admin Dashboard</h1>
-        <button className="btn" onClick={() => { localStorage.removeItem('admin'); window.dispatchEvent(new CustomEvent('admin:change', { detail: null })); navigate('/'); }}>
-          Sign out
-        </button>
+        <div style={{display: 'flex', gap: 12}}>
+          <button className={`btn ${tab === 'products' ? 'primary' : ''}`} onClick={() => setTab('products')}>Products</button>
+          <button className={`btn ${tab === 'orders' ? 'primary' : ''}`} onClick={() => setTab('orders')}>Orders</button>
+          <button className="btn" onClick={() => { localStorage.removeItem('admin'); window.dispatchEvent(new CustomEvent('admin:change', { detail: null })); navigate('/'); }}>
+            Sign out
+          </button>
+        </div>
       </div>
 
       <div className="admin-container">
-        <div className="admin-form-section">
-          <h2>{editId ? 'Edit Product' : 'Add New Product'}</h2>
-          {error && <div className="admin-error">{error}</div>}
-          <form onSubmit={handleSubmit} className="admin-form">
+        {tab === 'products' ? (
+          <>
+            <div className="admin-form-section">
+              <h2>{editId ? 'Edit Product' : 'Add New Product'}</h2>
+              {error && <div className="admin-error">{error}</div>}
+              <form onSubmit={handleSubmit} className="admin-form">
             <div className="admin-form-group">
               <label className="admin-label">Product Name *</label>
               <input type="text" placeholder="Enter product name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
@@ -248,7 +306,76 @@ export default function AdminDashboard() {
             ))}
           </div>
         </div>
+          </>
+        ) : (
+          <div className="admin-orders-section" style={{width: '100%'}}>
+            <h2>Customer Orders ({orders.length})</h2>
+            {error && <div className="admin-error">{error}</div>}
+            {orders.length === 0 ? (
+              <p style={{textAlign: 'center', color: '#999'}}>No orders yet</p>
+            ) : (
+              <div style={{display: 'flex', flexDirection: 'column', gap: 16}}>
+                {orders.map(order => (
+                  <div key={order._id} style={{border: '1px solid #e0e0e0', borderRadius: 8, padding: 16}}>
+                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12}}>
+                      <div>
+                        <h3 style={{margin: '0 0 4px 0'}}>Order #{order._id.toString().slice(-8).toUpperCase()}</h3>
+                        <p style={{margin: 0, fontSize: '0.9rem', color: '#666'}}>
+                          {order.userId?.name || 'Customer'} • {order.userId?.email || 'N/A'} • {formatDate(order.orderDate)}
+                        </p>
+                      </div>
+                      <span style={{
+                        padding: '6px 12px',
+                        borderRadius: 4,
+                        backgroundColor: order.status === 'delivered' ? '#d4edda' : order.status === 'cancelled' ? '#f8d7da' : '#cce5ff',
+                        color: order.status === 'delivered' ? '#155724' : order.status === 'cancelled' ? '#721c24' : '#004085',
+                        fontWeight: 600,
+                        fontSize: '0.85rem'
+                      }}>{order.status.charAt(0).toUpperCase() + order.status.slice(1)}</span>
+                    </div>
+
+                    <div style={{marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid #f0f0f0'}}>
+                      <p style={{margin: '0 0 8px 0', fontWeight: 600, fontSize: '0.9rem'}}>Items:</p>
+                      {order.items?.map((item, idx) => (
+                        <p key={idx} style={{margin: '4px 0', fontSize: '0.85rem', color: '#555'}}>
+                          {item.name} x{item.quantity} = ${(item.price * item.quantity).toFixed(2)}
+                        </p>
+                      ))}
+                      <p style={{margin: '8px 0 0 0', fontWeight: 600}}>Total: ${order.total.toFixed(2)}</p>
+                    </div>
+
+                    {editingOrder === order._id ? (
+                      <div style={{padding: 12, backgroundColor: '#f9f9f9', borderRadius: 4, marginBottom: 12}}>
+                        <h4 style={{margin: '0 0 12px 0'}}>Update Order</h4>
+                        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12}}>
+                          <select value={orderStatusForm.status} onChange={e => setOrderStatusForm({...orderStatusForm, status: e.target.value})} style={{padding: 8, borderRadius: 4, border: '1px solid #ddd'}}>
+                            <option value="">Select status</option>
+                            <option value="pending">Pending</option>
+                            <option value="dispatched">Dispatched</option>
+                            <option value="in_transit">In Transit</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                          </select>
+                          <input type="date" value={orderStatusForm.dispatchDate} onChange={e => setOrderStatusForm({...orderStatusForm, dispatchDate: e.target.value})} style={{padding: 8, borderRadius: 4, border: '1px solid #ddd'}} placeholder="Dispatch Date" />
+                          <input type="date" value={orderStatusForm.departureDate} onChange={e => setOrderStatusForm({...orderStatusForm, departureDate: e.target.value})} style={{padding: 8, borderRadius: 4, border: '1px solid #ddd'}} placeholder="Departure Date" />
+                          <input type="date" value={orderStatusForm.deliveryDate} onChange={e => setOrderStatusForm({...orderStatusForm, deliveryDate: e.target.value})} style={{padding: 8, borderRadius: 4, border: '1px solid #ddd'}} placeholder="Delivery Date" />
+                        </div>
+                        <div style={{marginTop: 12, display: 'flex', gap: 8}}>
+                          <button className="btn primary" onClick={() => updateOrderStatus(order._id)} disabled={loading}>Update</button>
+                          <button className="btn ghost" onClick={() => setEditingOrder(null)}>Cancel</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button className="btn ghost" onClick={() => { setEditingOrder(order._id); const o = orders.find(x => x._id === order._id); setOrderStatusForm({status: o?.status || '', dispatchDate: o?.dispatchDate || '', departureDate: o?.departureDate || '', deliveryDate: o?.deliveryDate || ''}); }}>Update Status</button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )
+
 }
